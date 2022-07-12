@@ -1,0 +1,63 @@
+tickets:
+  - title: Fix security issue with entities being used as `@RequestBody` fields
+    description: |
+      SonarLint highlights an issue with this project's approach to accepting
+      data from the user. For example, in `PlaylistsController`'s `create`
+      method.
+
+      ```java
+        public Playlist create(@RequestBody Playlist playlist) {
+      ```
+
+      [See SonarLint docs for further
+      details.](https://rules.sonarsource.com/java/tag/spring/RSPEC-4684)
+
+  - title: Order playlists by last track added
+    description: |
+      When you add a track to a playlist, it currently adds it in some odd place
+      in the playlist.
+
+      Amend the application so that the next playlist appears at the bottom.
+
+  - title: Assign tracks and playlists to the signed in user
+    description: |
+      Currently, no matter who you log in as you can see everyone's playlists
+      and tracks.
+
+      Amend the application so that the user only sees their own playlists and
+      tracks.
+
+  - title: Prohibit empty playlist names
+    description: |
+      Currently, you can add a playlist with an empty name and it shows up as
+      a strange tiny box.
+
+      Amend the application so that playlists with empty names are not created.
+
+  - title: Prohibit empty track title & artist
+    description: |
+      Currently, you can add a track with an empty title or artist and it shows
+      up as blank.
+
+      Amend the application so that tracks with empty fields are not created.
+
+  - title: Implement deleting tracks from playlist
+    description: |
+      The client expects to send requests as follows:
+
+      ```
+      DELETE /api/playlists/:playlist_id/tracks/:track_id
+      # Expected response if the track is successfully removed:
+      # Status code: 200 (OK)
+      # But with no content
+      ```
+
+      And have the track removed from the playlist.
+
+  - title: Implement deleting playlists
+    description: |
+      Right now the user can't delete playlists.
+
+      Implement the functionality to do so and comment here documenting the
+      endpoint you have created. This information will be handed to the
+      front-end team who will implement based on your description.

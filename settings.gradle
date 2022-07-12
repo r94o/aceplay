@@ -1,0 +1,10 @@
+// https://www.youtube.com/watch?v=L4vkcgRnw2g&t=2745s
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        // add mavenLocal() if you are using a locally built version of the plugin
+    }
+}
+
+rootProject.name = 'aceplay'
