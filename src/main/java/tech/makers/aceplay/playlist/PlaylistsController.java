@@ -21,9 +21,12 @@ public class PlaylistsController {
   }
 
   @PostMapping("/api/playlists")
-  public Playlist create(@RequestBody Playlist playlist) {
+  public Playlist create(@RequestBody PlaylistDTO playlistDTO) {
+    Playlist playlist = new Playlist(playlistDTO.getName());
     return playlistRepository.save(playlist);
   }
+
+
 
   @GetMapping("/api/playlists/{id}")
   public Playlist get(@PathVariable Long id) {
