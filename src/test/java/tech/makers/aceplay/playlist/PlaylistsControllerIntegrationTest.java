@@ -164,27 +164,13 @@ class PlaylistsControllerIntegrationTest {
   @WithMockUser
   void WhenLoggedIn_APlaylistHasTracksSortedInTheOrderTheyAreAdded() throws Exception {
     Playlist playlist = repository.save(new Playlist("My Playlist"));
-    Track track1 = trackRepository.save(new Track("Title1", "Artist1", "https://example.org/1"));
-    Track track2 = trackRepository.save(new Track("Title2", "Artist2", "https://example.org/2"));
-    Track track3 = trackRepository.save(new Track("Title3", "Artist3", "https://example.org/3"));
-    Track track4 = trackRepository.save(new Track("Title4", "Artist4", "https://example.org/4"));
-    Track track5 = trackRepository.save(new Track("Title5", "Artist5", "https://example.org/5"));
-    Track track6 = trackRepository.save(new Track("Title6", "Artist6", "https://example.org/6"));
-
-
     Playlist savedPlaylist = repository.findById(playlist.getId()).orElseThrow();
-    savedPlaylist.getTracks().add(track1);
-    savedPlaylist = repository.save(savedPlaylist);
-    savedPlaylist.getTracks().add(track2);
-    savedPlaylist = repository.save(savedPlaylist);
-    savedPlaylist.getTracks().add(track3);
-    savedPlaylist = repository.save(savedPlaylist);
-    savedPlaylist.getTracks().add(track4);
-    savedPlaylist = repository.save(savedPlaylist);
-    savedPlaylist.getTracks().add(track5);
-    savedPlaylist = repository.save(savedPlaylist);
-    savedPlaylist.getTracks().add(track6);
-    repository.save(savedPlaylist);
+
+    for(int i = 1; i <= 6; i++) {
+      Track track = trackRepository.save(new Track("Title" + i, "Artist", "https://example.org/"));
+      savedPlaylist.getTracks().add(track);
+      savedPlaylist = repository.save(savedPlaylist);
+    }
 
     mvc.perform(
             MockMvcRequestBuilders.get("/api/playlists/" + playlist.getId())
