@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -52,7 +53,7 @@ class PlaylistsControllerIntegrationTest {
   @WithMockUser
   void WhenLoggedIn_AndThereArePlaylists_PlaylistIndexReturnsTracks() throws Exception {
     Track track = trackRepository.save(new Track("Title", "Artist", "https://example.org/"));
-    repository.save(new Playlist("My Playlist", Set.of(track)));
+    repository.save(new Playlist("My Playlist", List.of(track)));
     repository.save(new Playlist("Their Playlist"));
 
     mvc.perform(MockMvcRequestBuilders.get("/api/playlists").contentType(MediaType.APPLICATION_JSON))
@@ -84,7 +85,7 @@ class PlaylistsControllerIntegrationTest {
   @WithMockUser
   void WhenLoggedIn_AndThereIsAPlaylist_PlaylistGetReturnsPlaylist() throws Exception {
     Track track = trackRepository.save(new Track("Title", "Artist", "https://example.org/"));
-    Playlist playlist = repository.save(new Playlist("My Playlist", Set.of(track)));
+    Playlist playlist = repository.save(new Playlist("My Playlist", List.of(track)));
 
     mvc.perform(MockMvcRequestBuilders.get("/api/playlists/" + playlist.getId()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -119,7 +120,7 @@ class PlaylistsControllerIntegrationTest {
 
     Playlist playlist = repository.findFirstByOrderByIdAsc();
     assertEquals("My Playlist Name", playlist.getName());
-    assertEquals(Set.of(), playlist.getTracks());
+    assertEquals(List.of(), playlist.getTracks());
   }
 
   @Test
@@ -157,5 +158,44 @@ class PlaylistsControllerIntegrationTest {
     Track includedTrack = updatedPlaylist.getTracks().stream().findFirst().orElseThrow();
     assertEquals(track.getId(), includedTrack.getId());
     assertEquals("Title", includedTrack.getTitle());
+  }
+
+  @Test
+  @WithMockUser
+  void WhenLoggedIn_APlaylistHasTracksSortedInTheOrderTheyAreAdded() throws Exception {
+    Playlist playlist = repository.save(new Playlist("My Playlist"));
+    Track track1 = trackRepository.save(new Track("Title1", "Artist1", "https://example.org/1"));
+    Track track2 = trackRepository.save(new Track("Title2", "Artist2", "https://example.org/2"));
+    Track track3 = trackRepository.save(new Track("Title3", "Artist3", "https://example.org/3"));
+    Track track4 = trackRepository.save(new Track("Title4", "Artist4", "https://example.org/4"));
+    Track track5 = trackRepository.save(new Track("Title5", "Artist5", "https://example.org/5"));
+    Track track6 = trackRepository.save(new Track("Title6", "Artist6", "https://example.org/6"));
+
+
+    Playlist savedPlaylist = repository.findById(playlist.getId()).orElseThrow();
+    savedPlaylist.getTracks().add(track1);
+    savedPlaylist = repository.save(savedPlaylist);
+    savedPlaylist.getTracks().add(track2);
+    savedPlaylist = repository.save(savedPlaylist);
+    savedPlaylist.getTracks().add(track3);
+    savedPlaylist = repository.save(savedPlaylist);
+    savedPlaylist.getTracks().add(track4);
+    savedPlaylist = repository.save(savedPlaylist);
+    savedPlaylist.getTracks().add(track5);
+    savedPlaylist = repository.save(savedPlaylist);
+    savedPlaylist.getTracks().add(track6);
+    repository.save(savedPlaylist);
+
+    mvc.perform(
+            MockMvcRequestBuilders.get("/api/playlists/" + playlist.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.tracks[0].title").value("Title1"))
+            .andExpect(jsonPath("$.tracks[1].title").value("Title2"))
+            .andExpect(jsonPath("$.tracks[2].title").value("Title3"))
+            .andExpect(jsonPath("$.tracks[3].title").value("Title4"))
+            .andExpect(jsonPath("$.tracks[4].title").value("Title5"))
+            .andExpect(jsonPath("$.tracks[5].title").value("Title6"));
   }
 }
