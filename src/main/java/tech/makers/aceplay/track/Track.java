@@ -1,11 +1,10 @@
 package tech.makers.aceplay.track;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import tech.makers.aceplay.user.User;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import javax.persistence.*;
 
 // https://www.youtube.com/watch?v=5r3QU09v7ig&t=2999s
 @Entity
@@ -20,6 +19,10 @@ public class Track {
 
   private URL publicUrl;
 
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
+
   public Track() { }
 
   public Track(String title, String artist, URL publicUrl) {
@@ -30,6 +33,14 @@ public class Track {
 
   public Track(String title, String artist, String publicUrl) throws MalformedURLException {
     this(title, artist, new URL(publicUrl));
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+  public User getUser() {
+    return user;
   }
 
   public String toString() {
