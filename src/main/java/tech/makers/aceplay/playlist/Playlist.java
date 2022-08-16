@@ -20,8 +20,8 @@ public class Playlist {
   @ManyToMany(fetch = FetchType.EAGER)
   private List<Track> tracks;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name="user_id", nullable = false)
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name="user_id")
   private User user;
 
   public Playlist() {}
