@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
+import tech.makers.aceplay.user.User;
+import tech.makers.aceplay.user.UserRepository;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +30,8 @@ class TracksControllerIntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired private TrackRepository repository;
+
+  @Autowired private UserRepository userRepository;
 
   @Test
   @WithMockUser
@@ -159,5 +163,27 @@ class TracksControllerIntegrationTest {
         .andExpect(status().isForbidden());
 
     assertEquals(1, repository.count());
+  }
+
+  @Test
+  @WithMockUser
+  void WhenLoggedIn_TheTracksReturnedAreOnlyTheUsers() throws Exception {
+    User user = userRepository.save(new User("username", "password"));
+    Track track = new Track("Track1", "Charlotte", "http://example.org");
+    track.setUser(user);
+    repository.save(track);
+
+    User anotherUser = userRepository.save(new User("anotherUsername", "password"));
+    Track anotherTrack = new Track("AnotherTrack", "Charlotte", "http://example.org");
+    anotherTrack.setUser(anotherUser);
+    repository.save(anotherTrack);
+
+    mvc.perform(MockMvcRequestBuilders.get("/api/tracks/user/" + user.getId()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].title").value("Track1"));
+
+
   }
 }

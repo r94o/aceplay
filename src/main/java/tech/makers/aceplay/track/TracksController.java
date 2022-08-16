@@ -16,6 +16,12 @@ public class TracksController {
     return trackRepository.findAll();
   }
 
+  @GetMapping("/api/tracks/user/{id}")
+  public Iterable<Track> userTracks(@PathVariable Long id) {
+    return trackRepository.findAllByUserId(id);
+
+  }
+
   @PostMapping("/api/tracks")
   public Track create(@RequestBody TrackDTO trackDTO) {
     Track track = new Track(trackDTO.getTitle(),trackDTO.getArtist(), trackDTO.getPublicUrl());
