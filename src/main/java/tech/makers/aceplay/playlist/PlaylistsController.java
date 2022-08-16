@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
+import tech.makers.aceplay.user.User;
+import tech.makers.aceplay.user.UserRepository;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -12,6 +14,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestController
 public class PlaylistsController {
   @Autowired private PlaylistRepository playlistRepository;
+
+  @Autowired private UserRepository userRepository;
 
   @Autowired private TrackRepository trackRepository;
 
@@ -29,7 +33,15 @@ public class PlaylistsController {
   @GetMapping("/api/playlists/user/{id}")
   public Iterable<Playlist> userPlaylists(@PathVariable Long id) {
     return playlistRepository.findAllByUserId(id);
+  }
 
+  @PostMapping("/api/playlists/user/{id}")
+  public Playlist createWithUser(@PathVariable Long id, @RequestBody PlaylistDTO playlistDTO) {
+    Playlist playlist = new Playlist(playlistDTO.getName());
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No user exists with id " + id));
+    playlist.setUser(user);
+    return playlistRepository.save(playlist);
   }
 
   @GetMapping("/api/playlists/{id}")

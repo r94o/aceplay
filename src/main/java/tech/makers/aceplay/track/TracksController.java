@@ -3,6 +3,8 @@ package tech.makers.aceplay.track;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import tech.makers.aceplay.user.User;
+import tech.makers.aceplay.user.UserRepository;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -10,6 +12,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestController
 public class TracksController {
   @Autowired private TrackRepository trackRepository;
+
+  @Autowired private UserRepository userRepository;
 
   @GetMapping("/api/tracks")
   public Iterable<Track> index() {
@@ -19,7 +23,15 @@ public class TracksController {
   @GetMapping("/api/tracks/user/{id}")
   public Iterable<Track> userTracks(@PathVariable Long id) {
     return trackRepository.findAllByUserId(id);
+  }
 
+  @PostMapping("/api/tracks/user/{id}")
+  public Track createWithUser(@PathVariable Long id, @RequestBody TrackDTO trackDTO) {
+    Track track = new Track(trackDTO.getTitle(),trackDTO.getArtist(), trackDTO.getPublicUrl());
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No user exists with id " + id));
+    track.setUser(user);
+    return trackRepository.save(track);
   }
 
   @PostMapping("/api/tracks")

@@ -72,6 +72,10 @@ public class Track {
     this.user = user;
   }
 
+  public User getUser() {
+    return user;
+  }
+
   public void setPublicUrl(URL publicUrl) {
     this.publicUrl = publicUrl;
   }
