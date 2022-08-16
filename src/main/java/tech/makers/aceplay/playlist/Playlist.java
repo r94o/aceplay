@@ -2,6 +2,7 @@ package tech.makers.aceplay.playlist;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import tech.makers.aceplay.track.Track;
+import tech.makers.aceplay.user.User;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,6 +19,10 @@ public class Playlist {
 
   @ManyToMany(fetch = FetchType.EAGER)
   private List<Track> tracks;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name="user_id", nullable = false)
+  private User user;
 
   public Playlist() {}
 
@@ -40,6 +45,10 @@ public class Playlist {
 
   public Long getId() {
     return id;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
   }
 
   @JsonGetter("tracks")

@@ -26,7 +26,11 @@ public class PlaylistsController {
     return playlistRepository.save(playlist);
   }
 
+  @GetMapping("/api/playlists/user/{id}")
+  public Iterable<Playlist> userPlaylists(@PathVariable Long id) {
+    return playlistRepository.findAllByUserId(id);
 
+  }
 
   @GetMapping("/api/playlists/{id}")
   public Playlist get(@PathVariable Long id) {

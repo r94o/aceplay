@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
+import tech.makers.aceplay.user.User;
+import tech.makers.aceplay.user.UserRepository;
 
 import java.util.List;
 import java.util.Set;
@@ -33,6 +35,8 @@ class PlaylistsControllerIntegrationTest {
   @Autowired private TrackRepository trackRepository;
 
   @Autowired private PlaylistRepository repository;
+
+  @Autowired private UserRepository userRepository;
 
   @Test
   void WhenLoggedOut_PlaylistsIndexReturnsForbidden() throws Exception {
@@ -184,4 +188,28 @@ class PlaylistsControllerIntegrationTest {
             .andExpect(jsonPath("$.tracks[4].title").value("Title5"))
             .andExpect(jsonPath("$.tracks[5].title").value("Title6"));
   }
+
+  @Test
+  @WithMockUser
+  void WhenLoggedIn_ThePlaylistsReturnedAreOnlyTheUsers() throws Exception {
+    User user = userRepository.save(new User("username", "password"));
+    Playlist playlist = new Playlist("My Playlist", List.of());
+    playlist.setUser(user);
+    repository.save(playlist);
+
+    User anotherUser = userRepository.save(new User("AnotherUsername", "password"));
+    Playlist anotherPlaylist = new Playlist("Another Playlist", List.of());
+    anotherPlaylist.setUser(anotherUser);
+    repository.save(anotherPlaylist);
+
+    mvc.perform(
+            MockMvcRequestBuilders.get("/api/playlists/user/" + user.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].name").value("My Playlist"));
+  }
+
+
 }
