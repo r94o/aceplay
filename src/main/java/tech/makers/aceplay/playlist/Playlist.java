@@ -24,17 +24,23 @@ public class Playlist {
   @JoinColumn(name="user_id")
   private User user;
 
-  public Playlist() {}
+  public Playlist() throws Exception {}
 
-  public Playlist(String name) {
+  public Playlist(String name) throws Exception {
     this(name, null);
   }
 
-  public Playlist(String name, List<Track> tracks) {
-    this.name = name;
+  public Playlist(String name, List<Track> tracks) throws Exception {
+    this.name = checkNameNotEmpty(name);
     this.tracks = tracks;
   }
 
+  private String checkNameNotEmpty(String name) throws Exception {
+    if(name.isBlank()){
+      throw new IllegalArgumentException("Please add name");
+    }
+    return name;
+  }
   public String getName() {
     return name;
   }

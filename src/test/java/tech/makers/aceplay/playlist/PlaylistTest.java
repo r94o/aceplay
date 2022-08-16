@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 // https://www.youtube.com/watch?v=L4vkcgRnw2g&t=1099s
 class PlaylistTest {
@@ -25,6 +25,18 @@ class PlaylistTest {
     assertEquals(
         "Playlist[id=null name='Hello, world!']",
         subject.toString());
+  }
+
+  @Test
+  void ignoreEmptyPlaylistNames() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      Playlist playlist = new Playlist("");
+    });
+    String expectedMessage = "Please add name";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+
   }
 }
 
