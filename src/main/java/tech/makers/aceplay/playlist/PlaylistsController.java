@@ -1,17 +1,10 @@
 package tech.makers.aceplay.playlist;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import tech.makers.aceplay.TokenDecoder;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
-
-
-import java.util.Base64;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -23,9 +16,7 @@ public class PlaylistsController {
   @Autowired private TrackRepository trackRepository;
 
   @GetMapping("/api/playlists")
-  public Iterable<Playlist> playlists(@RequestHeader("authorization") String token) {
-    String username = TokenDecoder.getUsernameFromToken(token);
-
+  public Iterable<Playlist> playlists() {
     return playlistRepository.findAll();
   }
 
@@ -34,6 +25,7 @@ public class PlaylistsController {
     Playlist playlist = new Playlist(playlistDTO.getName());
     return playlistRepository.save(playlist);
   }
+
 
 
   @GetMapping("/api/playlists/{id}")

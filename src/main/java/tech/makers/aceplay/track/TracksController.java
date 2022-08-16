@@ -3,10 +3,6 @@ package tech.makers.aceplay.track;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
-import tech.makers.aceplay.TokenDecoder;
-import tech.makers.aceplay.user.User;
-import tech.makers.aceplay.user.UserRepository;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -14,20 +10,15 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestController
 public class TracksController {
   @Autowired private TrackRepository trackRepository;
-  @Autowired private UserRepository userRepository;
+
   @GetMapping("/api/tracks")
-  public Iterable<Track> index(@RequestHeader("authorization") String token) {
-    String username = TokenDecoder.getUsernameFromToken(token);
-    User user = userRepository.findByUsername(username);
-    return trackRepository.findAllByUser(user);
+  public Iterable<Track> index() {
+    return trackRepository.findAll();
   }
 
-  @PostMapping("/api/tracks" )
-  public Track create(@RequestBody TrackDTO trackDTO,@RequestHeader("authorization") String token) {
-    String username = TokenDecoder.getUsernameFromToken(token);
-    User user = userRepository.findByUsername(username);
+  @PostMapping("/api/tracks")
+  public Track create(@RequestBody TrackDTO trackDTO) {
     Track track = new Track(trackDTO.getTitle(),trackDTO.getArtist(), trackDTO.getPublicUrl());
-    track.setUser(user);
     return trackRepository.save(track);
   }
 

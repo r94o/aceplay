@@ -1,18 +1,13 @@
 package tech.makers.aceplay.user;
 
-import org.hibernate.boot.model.source.spi.FetchCharacteristics;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import tech.makers.aceplay.playlist.Playlist;
-import tech.makers.aceplay.track.Track;
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 
 // https://www.youtube.com/watch?v=5r3QU09v7ig&t=1156s
 @Entity
@@ -28,12 +23,6 @@ public class User implements UserDetails {
   private String username;
 
   private String password;
-
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-  private List<Playlist> playlists;
-
-  @OneToMany(fetch = FetchType.LAZY)
-  private List<Track> tracks;
 
   protected User() {}
 
