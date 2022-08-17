@@ -5,6 +5,7 @@ import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.user.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class Playlist {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
+  @NotBlank
   private String name;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -24,22 +25,15 @@ public class Playlist {
   @JoinColumn(name="user_id")
   private User user;
 
-  public Playlist() throws Exception {}
+  public Playlist() {}
 
-  public Playlist(String name) throws Exception {
+  public Playlist(String name) {
     this(name, null);
   }
 
-  public Playlist(String name, List<Track> tracks) throws Exception {
-    this.name = checkNameNotEmpty(name);
+  public Playlist(String name, List<Track> tracks) {
+    this.name = name;
     this.tracks = tracks;
-  }
-
-  private String checkNameNotEmpty(String name) throws Exception {
-    if(name.isBlank()){
-      throw new IllegalArgumentException("Please add name");
-    }
-    return name;
   }
   public String getName() {
     return name;

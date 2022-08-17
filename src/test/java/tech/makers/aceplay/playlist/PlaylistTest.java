@@ -23,20 +23,8 @@ class PlaylistTest {
   void testToString() {
     Playlist subject = new Playlist("Hello, world!");
     assertEquals(
-        "Playlist[id=null name='Hello, world!']",
-        subject.toString());
-  }
-
-  @Test
-  void ignoreEmptyPlaylistNames() {
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      Playlist playlist = new Playlist("");
-    });
-    String expectedMessage = "Please add name";
-    String actualMessage = exception.getMessage();
-
-    assertTrue(actualMessage.contains(expectedMessage));
-
+            "Playlist[id=null name='Hello, world!']",
+            subject.toString());
   }
 }
 

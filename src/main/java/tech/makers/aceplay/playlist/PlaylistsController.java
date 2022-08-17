@@ -4,6 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tech.makers.aceplay.track.Track;
@@ -13,6 +14,7 @@ import tech.makers.aceplay.user.UserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 // https://www.youtube.com/watch?v=vreyOZxdb5Y&t=0s
@@ -32,7 +34,12 @@ public class PlaylistsController {
   @PostMapping("/api/playlists")
   public Playlist create(@RequestBody PlaylistDTO playlistDTO) {
     Playlist playlist = new Playlist(playlistDTO.getName());
-    return playlistRepository.save(playlist);
+    try {
+      return playlistRepository.save(playlist);
+    }
+    catch(TransactionSystemException e){
+      throw new ResponseStatusException(BAD_REQUEST, "Please enter a valid name");
+    }
   }
 
   @GetMapping("/api/playlists/user/{id}")
@@ -42,12 +49,7 @@ public class PlaylistsController {
 
   @PostMapping("/api/playlists/user/{id}")
   public Playlist createWithUser(@PathVariable Long id, @RequestBody PlaylistDTO playlistDTO) {
-    try {
       Playlist playlist = new Playlist(playlistDTO.getName());
-    } catch (IllegalArgumentException e) {
-      System.out.println("Please add name");
-    }
-
     User user = userRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No user exists with id " + id));
     playlist.setUser(user);

@@ -211,5 +211,27 @@ class PlaylistsControllerIntegrationTest {
             .andExpect(jsonPath("$[0].name").value("My Playlist"));
   }
 
+@Test
+@WithMockUser
+void ThrowErrorWithBlankPlaylistName() throws Exception {
+  mvc.perform(
+                  MockMvcRequestBuilders.post("/api/playlists")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content("{\"name\": \" \"}"))
+          .andExpect(status().isBadRequest());
 
+  assertEquals(0, repository.count());
+}
+
+  @Test
+  @WithMockUser
+  void ThrowErrorWithEmptyPlaylistName() throws Exception {
+    mvc.perform(
+                    MockMvcRequestBuilders.post("/api/playlists")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"name\": \"\"}"))
+            .andExpect(status().isBadRequest());
+
+    assertEquals(0, repository.count());
+  }
 }
