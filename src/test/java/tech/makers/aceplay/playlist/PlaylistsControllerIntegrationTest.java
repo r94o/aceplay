@@ -248,4 +248,14 @@ void ThrowErrorWithBlankPlaylistName() throws Exception {
     assertTrue(updatedPlaylist.getTracks().isEmpty());
   }
 
-}
+  @Test
+  @WithMockUser
+  void AllowUserToDeletePlaylists() throws Exception {
+    Playlist playlist = repository.save(new Playlist("My Playlist", List.of()));
+
+    mvc.perform(
+            MockMvcRequestBuilders.delete("/api/playlists/" + playlist.getId()))
+            .andExpect(status().isOk());
+    assertEquals(0, repository.count());
+  }
+  }
