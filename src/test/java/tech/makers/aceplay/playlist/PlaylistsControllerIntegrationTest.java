@@ -234,4 +234,18 @@ void ThrowErrorWithBlankPlaylistName() throws Exception {
 
     assertEquals(0, repository.count());
   }
+
+  @Test
+  @WithMockUser
+  void AllowUserToDeleteTracksFromPlaylists() throws Exception {
+    Track track = trackRepository.save(new Track("Title", "Artist", "https://example.org/"));
+    Playlist playlist = repository.save(new Playlist("My Playlist", List.of(track)));
+
+    mvc.perform(
+                    MockMvcRequestBuilders.delete("/api/playlists/" + playlist.getId() + "/tracks/" + track.getId()))
+    .andExpect(status().isOk());
+    Playlist updatedPlaylist = repository.findById(playlist.getId()).orElseThrow();
+    assertTrue(updatedPlaylist.getTracks().isEmpty());
+  }
+
 }
