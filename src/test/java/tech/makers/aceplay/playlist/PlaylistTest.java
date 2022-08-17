@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 // https://www.youtube.com/watch?v=L4vkcgRnw2g&t=1099s
 class PlaylistTest {
@@ -23,8 +23,8 @@ class PlaylistTest {
   void testToString() {
     Playlist subject = new Playlist("Hello, world!");
     assertEquals(
-        "Playlist[id=null name='Hello, world!']",
-        subject.toString());
+            "Playlist[id=null name='Hello, world!']",
+            subject.toString());
   }
 }
 

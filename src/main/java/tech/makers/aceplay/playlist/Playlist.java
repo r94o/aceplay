@@ -5,6 +5,7 @@ import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.user.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class Playlist {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
+  @NotBlank
   private String name;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -34,7 +35,6 @@ public class Playlist {
     this.name = name;
     this.tracks = tracks;
   }
-
   public String getName() {
     return name;
   }
