@@ -4,6 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -81,6 +82,16 @@ public class PlaylistsController {
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No track exists with id " + track_id));
     playlist.getTracks().remove(track);
     playlistRepository.save(playlist);
+  }
+
+  @DeleteMapping("/api/playlists/{playlist_id}" )
+  public void delete(@PathVariable Long playlist_id) {
+  try {
+    playlistRepository.deleteById(playlist_id) ;
+  } catch(EmptyResultDataAccessException e) {
+    throw new ResponseStatusException(NOT_FOUND, "No playlist exists with id " + playlist_id);
+    }
+
   }
 
 }
