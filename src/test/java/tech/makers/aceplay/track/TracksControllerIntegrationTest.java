@@ -186,4 +186,26 @@ class TracksControllerIntegrationTest {
 
 
   }
+
+  @Test
+  @WithMockUser
+  void ThrowErrorWithEmptyTrackAndArtistName() throws Exception {
+    mvc.perform(
+                    MockMvcRequestBuilders.post("/api/tracks/")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"title\": \"\", \"artist\": \"\"}"))
+            .andExpect(status().isBadRequest());
+    assertEquals(0, repository.count());
+  }
+
+  @Test
+  @WithMockUser
+  void ThrowErrorWithCharacterForTrackAndArtistName() throws Exception {
+    mvc.perform(
+                    MockMvcRequestBuilders.post("/api/tracks/")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"title\": \" \", \"artist\": \" \"}"))
+            .andExpect(status().isBadRequest());
+    assertEquals(0, repository.count());
+  }
 }

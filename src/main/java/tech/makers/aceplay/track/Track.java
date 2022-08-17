@@ -3,6 +3,7 @@ package tech.makers.aceplay.track;
 import tech.makers.aceplay.user.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -12,9 +13,9 @@ public class Track {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
+  @NotBlank
   private String title;
-
+  @NotBlank
   private String artist;
 
   private URL publicUrl;

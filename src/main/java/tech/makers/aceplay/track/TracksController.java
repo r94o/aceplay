@@ -1,11 +1,13 @@
 package tech.makers.aceplay.track;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tech.makers.aceplay.user.User;
 import tech.makers.aceplay.user.UserRepository;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 // https://www.youtube.com/watch?v=5r3QU09v7ig&t=2410s
@@ -37,7 +39,11 @@ public class TracksController {
   @PostMapping("/api/tracks")
   public Track create(@RequestBody TrackDTO trackDTO) {
     Track track = new Track(trackDTO.getTitle(),trackDTO.getArtist(), trackDTO.getPublicUrl());
-    return trackRepository.save(track);
+    try{
+      return trackRepository.save(track);}
+    catch(TransactionSystemException e) { throw new ResponseStatusException(BAD_REQUEST, "Please enter a valid track name and artist name");
+
+    }
   }
 
   @PatchMapping("/api/tracks/{id}")
