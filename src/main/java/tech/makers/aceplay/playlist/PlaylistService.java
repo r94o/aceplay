@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
+import tech.makers.aceplay.user.User;
+import tech.makers.aceplay.user.UserRepository;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -16,7 +18,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class PlaylistService {
     @Autowired private PlaylistRepository playlistRepository;
     @Autowired private TrackRepository trackRepository;
-
+    @Autowired private UserRepository userRepository;
     public Iterable<Playlist> getAllPlaylists() { return playlistRepository.findAll();
     }
     public Playlist createPlayList(PlaylistDTO playlistDTO){
@@ -33,7 +35,18 @@ public class PlaylistService {
        return playlistRepository.findAllByUserId(id);
    }
 
+   public Playlist createPlaylistWithUser(Long id, PlaylistDTO playlistDTO ) {
+       Playlist playlist = new Playlist(playlistDTO.getName());
+       User user = userRepository.findById(id)
+               .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No user exists with id " + id));
+       playlist.setUser(user);
+       return playlistRepository.save(playlist);
+   }
 
+   public Playlist getPlaylistById(Long id){
+       return playlistRepository.findById(id)
+               .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No playlist exists with id " + id));
+   }
     public Track addTrack(Long id, TrackIdentifierDto trackIdentifierDto) {
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No playlist exists with id " + id));
@@ -43,5 +56,14 @@ public class PlaylistService {
         playlistRepository.save(playlist);
         return track;
     }
+
+    public void deleteTracksFromPlaylist(Long playlist_id, Long track_id){
+    Playlist playlist = playlistRepository.findById(playlist_id)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No playlist exists with id " + playlist_id));
+    Track track = trackRepository.findById(track_id)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No track exists with id " + track_id));
+    playlist.getTracks().remove(track);
+    playlistRepository.save(playlist);
+}
 
 }
