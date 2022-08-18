@@ -13,55 +13,37 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 // https://www.youtube.com/watch?v=5r3QU09v7ig&t=2410s
 @RestController
 public class TracksController {
-  @Autowired private TrackRepository trackRepository;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired TrackService trackService;
 
   @GetMapping("/api/tracks")
   public Iterable<Track> index() {
-    return trackRepository.findAll();
+    return trackService.getAllTracks();
   }
 
   @GetMapping("/api/tracks/user/{id}")
   public Iterable<Track> userTracks(@PathVariable Long id) {
-    return trackRepository.findAllByUserId(id);
+    return trackService.getTracksByUserId(id);
   }
 
   @PostMapping("/api/tracks/user/{id}")
   public Track createWithUser(@PathVariable Long id, @RequestBody TrackDTO trackDTO) {
-    Track track = new Track(trackDTO.getTitle(),trackDTO.getArtist(), trackDTO.getPublicUrl());
-    User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No user exists with id " + id));
-    track.setUser(user);
-    return trackRepository.save(track);
+    return trackService.createTrackWithUser(id, trackDTO);
   }
 
   @PostMapping("/api/tracks")
   public Track create(@RequestBody TrackDTO trackDTO) {
-    Track track = new Track(trackDTO.getTitle(),trackDTO.getArtist(), trackDTO.getPublicUrl());
-    try{
-      return trackRepository.save(track);}
-    catch(TransactionSystemException e) { throw new ResponseStatusException(BAD_REQUEST, "Please enter a valid track name and artist name");
-
-    }
+    return trackService.createTrack(trackDTO);
   }
 
   @PatchMapping("/api/tracks/{id}")
   public Track update(@PathVariable Long id, @RequestBody TrackDTO newTrack) {
-    Track track = trackRepository
-            .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No track exists with id " + id));
-    track.setTitle(newTrack.getTitle());
-    track.setArtist(newTrack.getArtist());
-    trackRepository.save(track);
-    return track;
+    return trackService.updateTrack(id, newTrack);
   }
 
   @DeleteMapping("/api/tracks/{id}")
   public void delete(@PathVariable Long id) {
-    Track track = trackRepository
-            .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No track exists with id " + id));
-    trackRepository.delete(track);
+    trackService.deleteTrack(id);
+
   }
 }
