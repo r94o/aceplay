@@ -21,13 +21,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 // https://www.youtube.com/watch?v=vreyOZxdb5Y&t=0s
 @RestController
 public class PlaylistsController {
-  @Autowired private PlaylistRepository playlistRepository;
-
-  @Autowired private UserRepository userRepository;
-
-  @Autowired private TrackRepository trackRepository;
 
   @Autowired private PlaylistService playlistService;
+
   @GetMapping("/api/playlists")
   public Iterable<Playlist> playlists() {
     return playlistService.getAllPlaylists();
