@@ -27,9 +27,10 @@ public class PlaylistsController {
 
   @Autowired private TrackRepository trackRepository;
 
+  @Autowired private PlaylistService playlistService;
   @GetMapping("/api/playlists")
   public Iterable<Playlist> playlists() {
-    return playlistRepository.findAll();
+    return playlistService.getAllPlaylists();
   }
 
   @PostMapping("/api/playlists")
@@ -45,6 +46,7 @@ public class PlaylistsController {
 
   @GetMapping("/api/playlists/user/{id}")
   public Iterable<Playlist> userPlaylists(@PathVariable Long id) {
+
     return playlistRepository.findAllByUserId(id);
   }
 
@@ -65,14 +67,9 @@ public class PlaylistsController {
 
   @PutMapping("/api/playlists/{id}/tracks")
   public Track addTrack(@PathVariable Long id, @RequestBody TrackIdentifierDto trackIdentifierDto) {
-    Playlist playlist = playlistRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No playlist exists with id " + id));
-    Track track = trackRepository.findById(trackIdentifierDto.getId())
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No track exists with id " + trackIdentifierDto.getId()));
-    playlist.getTracks().add(track);
-    playlistRepository.save(playlist);
-    return track;
+    return playlistService.addTrack(id, trackIdentifierDto);
   }
+
 
   @DeleteMapping("/api/playlists/{playlist_id}/tracks/{track_id}" )
   public void delete(@PathVariable Long playlist_id, @PathVariable Long track_id) {
