@@ -1,10 +1,9 @@
 package tech.makers.aceplay.playlist;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
@@ -66,4 +65,11 @@ public class PlaylistService {
     playlistRepository.save(playlist);
 }
 
+    public void deletePlaylists(Long playlist_id) {
+        try {
+            playlistRepository.deleteById(playlist_id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResponseStatusException(NOT_FOUND, "No playlist exists with id " + playlist_id);
+        }
+    }
 }
