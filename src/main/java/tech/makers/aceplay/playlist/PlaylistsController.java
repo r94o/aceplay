@@ -35,19 +35,12 @@ public class PlaylistsController {
 
   @PostMapping("/api/playlists")
   public Playlist create(@RequestBody PlaylistDTO playlistDTO) {
-    Playlist playlist = new Playlist(playlistDTO.getName());
-    try {
-      return playlistRepository.save(playlist);
-    }
-    catch(TransactionSystemException e){
-      throw new ResponseStatusException(BAD_REQUEST, "Please enter a valid name");
-    }
+    return playlistService.createPlayList(playlistDTO);
   }
 
   @GetMapping("/api/playlists/user/{id}")
   public Iterable<Playlist> userPlaylists(@PathVariable Long id) {
-
-    return playlistRepository.findAllByUserId(id);
+    return playlistService.getPlaylistsByUserId(id);
   }
 
   @PostMapping("/api/playlists/user/{id}")
