@@ -7,4 +7,8 @@ public interface PlaylistRepository extends CrudRepository<Playlist, Long> {
   Playlist findFirstByOrderByIdAsc();
   Iterable<Playlist> findAllByUserId(long userId);
 
+
+
+  long countByTrackId(long track_id);
+
 }

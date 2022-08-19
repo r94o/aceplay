@@ -5,8 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.server.ResponseStatusException;
 import tech.makers.aceplay.ByIdFinder;
+import tech.makers.aceplay.playlist.Playlist;
+import tech.makers.aceplay.playlist.PlaylistRepository;
 import tech.makers.aceplay.user.User;
 import tech.makers.aceplay.user.UserRepository;
+
+import java.util.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -16,6 +20,8 @@ public class TrackService {
 
     @Autowired private TrackRepository trackRepository;
     @Autowired private UserRepository userRepository;
+
+    @Autowired private PlaylistRepository playlistRepository;
 
     public Iterable<Track> getAllTracks() {
         return trackRepository.findAll();
@@ -54,11 +60,22 @@ public class TrackService {
         trackRepository.delete(track);
     }
 
+
     public Iterable<Track> getSuggestedTracks(Long user_id) {
+        Iterable<Track> otherPeoplesTracks = trackRepository.findAllNotContainingUserId(user_id);
         // get all playlists
+        HashMap<Track,Long> trackHash;
         // get all tracks from playlists
         // count popularity
-        //
+        ArrayList<HashMap<Track,Long>> trackTally = new ArrayList<HashMap<Track,Long>>();
+        for (Track track : otherPeoplesTracks) {
+            Long trackCount = playlistRepository.countByTrackId(track.getId());
+            trackHash = new HashMap<Track, Long>();
+            trackHash.put(track,trackCount);
+            trackTally.add(trackHash);
+        }
+
+        Comparator sortedTracks = trackTally.
         //
         //
         // sort by count
