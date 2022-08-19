@@ -12,6 +12,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import tech.makers.aceplay.playlist.Playlist;
+import tech.makers.aceplay.playlist.PlaylistRepository;
 import tech.makers.aceplay.track.Track;
 import tech.makers.aceplay.track.TrackRepository;
 import tech.makers.aceplay.user.User;
@@ -32,6 +34,8 @@ class TracksControllerIntegrationTest {
   @Autowired private TrackRepository repository;
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private PlaylistRepository playlistRepository;
 
   @Test
   @WithMockUser
@@ -207,5 +211,61 @@ class TracksControllerIntegrationTest {
                             .content("{\"title\": \" \", \"artist\": \" \"}"))
             .andExpect(status().isBadRequest());
     assertEquals(0, repository.count());
+  }
+
+  @Test
+  @WithMockUser
+  void Top10TrackSuggestions() throws Exception {
+    User user = userRepository.save(new User("Rob", "password"));
+    Playlist playlist = new Playlist("My Hits");
+    playlist.setUser(user);
+    playlistRepository.save(playlist);
+
+    Playlist playlist2 = new Playlist("My Hits 2");
+    playlist2.setUser(user);
+    playlistRepository.save(playlist2);
+
+    Playlist playlist3 = new Playlist("My Hits 3");
+    playlist3.setUser(user);
+    playlistRepository.save(playlist3);
+
+    for(int i = 0; i < 15; i++) {
+      Track track = new Track("Track" + i, "Artist", "http://example.org");
+      track.setUser(user);
+      track = repository.save(track);
+
+      if (i >= 3 && i < 13) {
+        playlist.getTracks().add(track);
+        playlistRepository.save(playlist);
+      }
+
+      if (i >= 6 && i < 9) {
+        playlist2.getTracks().add(track);
+        playlistRepository.save(playlist2);
+      }
+
+      if (i == 8) {
+        playlist3.getTracks().add(track);
+        playlistRepository.save(playlist3);
+      }
+
+
+    }
+    mvc.perform(
+            MockMvcRequestBuilders.get("/api/tracks/user/999/suggested"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(10)))
+            .andExpect(jsonPath("$[0].title").value("Track8"))
+            .andExpect(jsonPath("$[1].title").value("Track6"))
+            .andExpect(jsonPath("$[2].title").value("Track7"))
+            .andExpect(jsonPath("$[3].title").value("Track3"))
+            .andExpect(jsonPath("$[4].title").value("Track4"))
+            .andExpect(jsonPath("$[5].title").value("Track5"))
+            .andExpect(jsonPath("$[6].title").value("Track9"))
+            .andExpect(jsonPath("$[7].title").value("Track10"))
+            .andExpect(jsonPath("$[8].title").value("Track11"))
+            .andExpect(jsonPath("$[9].title").value("Track12"));
+
   }
 }

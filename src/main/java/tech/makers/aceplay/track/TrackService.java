@@ -53,4 +53,17 @@ public class TrackService {
         Track track = ByIdFinder.findById(trackRepository, track_id);
         trackRepository.delete(track);
     }
+
+    public Iterable<Track> getSuggestedTracks(Long user_id) {
+        // get all playlists
+        // get all tracks from playlists
+        // count popularity
+        //
+        //
+        //
+        // sort by count
+        // trim array to max 10
+        // return array
+
+    }
 }
